@@ -1,468 +1,691 @@
-<!DOCTYPE html>
-<html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>บริษัท สบายดีสบายใจนอนอยู่บ้าน จำกัด — ทีมงานสายชิล</title>
-    <!-- Google Fonts for typography -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&family=Prompt:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body, html {
-            width: 100%;
-            height: 100%;
-            /* โทนสีบ้านๆ อบอุ่น ผ่อนคลายสไตล์อยู่บ้าน */
-            background: linear-gradient(135deg, #fef6e4 0%, #f3d2c1 50%, #8bd3dd 100%);
-            font-family: 'Prompt', sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            user-select: none;
-            -webkit-user-select: none;
-            color: #001858;
-        }
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Play, 
+  Pause, 
+  Github, 
+  Sparkles, 
+  Building2, 
+  Users, 
+  BookOpen, 
+  Briefcase, 
+  ShieldCheck, 
+  Cpu, 
+  TrendingUp, 
+  DollarSign, 
+  Award,
+  CheckCircle,
+  Copy,
+  ExternalLink,
+  Info
+} from 'lucide-react';
 
-        /* ตกแต่งส่วนหัวเว็บไซต์ให้ติดชิล ไม่เป็นทางการ */
-        .header {
-            position: absolute;
-            top: 25px;
-            text-align: center;
-            z-index: 10;
-            padding: 0 20px;
-        }
-        
-        .header h1 {
-            font-family: 'Mali', cursive;
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: #172c66;
-            margin-bottom: 6px;
-            text-shadow: 2px 2px 0px #ffffff;
-        }
-        
-        .header p {
-            font-family: 'Mali', cursive;
-            font-size: 1.1rem;
-            color: #f582ae;
-            background-color: #ffffff;
-            padding: 6px 16px;
-            border-radius: 20px;
-            display: inline-block;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            border: 2px dashed #f582ae;
-        }
+const TEAM_MEMBERS = [
+  {
+    id: 1,
+    name: 'นางสาวรดา นกเสวก (คุณข้าว)',
+    englishName: 'Sirinthorn Wises-sombat',
+    role: 'ประธานบริษัท',
+    roleEn: 'Chief Executive Officer (CEO)',
+    department: 'ผู้บริหารระดับสูง',
+    image: '6.jpg',
+    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+    icon: Award,
+    quote: 'วิสัยทัศน์ที่กว้างไกล คือรากฐานของความสำเร็จที่มั่นคงในสภาวะเศรษฐกิจยุคใหม่',
+    bio: 'ผู้นำวิสัยทัศน์ไกล มีประสบการณ์บริหารจัดการองค์กรให้เติบโตอย่างยั่งยืน มุ่งมั่นสร้างบรรยากาศการทำงานที่มีความสุขและเปิดกว้างสำหรับความคิดสร้างสรรค์ใหม่ๆ',
+    responsibilities: [
+      'กำหนดทิศทางยุทธศาสตร์และเป้าหมายระยะยาวของบริษัท',
+      'ดูแลความสัมพันธ์ระหว่างผู้ถือหุ้นและพาร์ทเนอร์ธุรกิจชั้นนำ',
+      'อนุมัตินโยบายหลักและการลงทุนสำคัญของ SabaiDiSabaichaiNoNYuBan'
+    ],
+    stats: { projects: '45+', experience: '10 ปี', rating: '4.9/5' }
+  },
+  {
+    id: 2,
+    name: 'นางสาวสุจิตราภรณ์ แสงหา (คุณฮาย)',
+    englishName: 'Nichapat Maneerat',
+    role: 'ฝ่ายการเงิน',
+    roleEn: 'Chief Financial Officer (CFO)',
+    department: 'การเงินและบัญชี',
+    image: '7.jpg',
+    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+    icon: DollarSign,
+    quote: 'การวางแผนทางการเงินที่รอบคอบ คือเกราะป้องกันความเสี่ยงและพลังขับเคลื่อนบริษัท',
+    bio: 'ผู้เชี่ยวชาญด้านการบริหารงบประมาณ วางแผนภาษี และวิเคราะห์ความคุ้มค่าทางการลงทุน มีความละเอียดแม่นยำในการจัดสรรทรัพยากรเพื่อให้เกิดประโยชน์สูงสุด',
+    responsibilities: [
+      'วางแผนและกำกับดูแลรายรับ-รายจ่ายของบริษัทอย่างใกล้ชิด',
+      'จัดทำรายงานทางการเงินและการวิเคราะห์กระแสเงินสดประจำเดือน',
+      'บริหารจัดการความเสี่ยงด้านการลงทุนและงบประมาณดำเนินงาน'
+    ],
+    stats: { accuracy: '99.9%', budgetManaged: '฿50M+', experience: '7 ปี' }
+  },
+  {
+    id: 3,
+    name: 'นางสาวลัดดาวัลย์ ราหุละ (คุณจิว)',
+    englishName: 'Chananthida Wongsawat',
+    role: 'ฝ่ายปฏิบัติการ',
+    roleEn: 'Chief Operating Officer (COO)',
+    department: 'บริหารจัดการและปฏิบัติการ',
+    image: '8.jpg',
+    badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
+    icon: ShieldCheck,
+    quote: 'การประสานงานที่ราบรื่นส่งผลให้ทุกโครงการบรรลุเป้าหมายได้อย่างมีประสิทธิภาพ',
+    bio: 'หัวเรือใหญ่ด้านกระบวนการทำงาน ควบคุมคุณภาพ และเชื่อมโยงทุกแผนกเข้าด้วยกันอย่างลงตัว มุ่งเน้นการปรับปรุงประสิทธิภาพกระบวนการ (Process Optimization)',
+    responsibilities: [
+      'ควบคุมดูแลมาตรฐานการทำงานประจำวันให้ตรงตาม KPI',
+      'ปรับปรุง workflow งานภายในเพื่อลดระยะเวลาและเพิ่มผลผลิต',
+      'ประสานงานระหว่างฝ่ายเพื่อแก้ไขปัญหาหน้างานอย่างรวดเร็ว'
+    ],
+    stats: { efficiency: '+40%', processDone: '120+', experience: '6 ปี' }
+  },
+  {
+    id: 4,
+    name: 'นายเกรียงศักดิ์ ปานสวย (คุณแม็ค)',
+    englishName: 'Pannathorn Srisuk',
+    role: 'ฝ่ายการตลาด',
+    roleEn: 'Chief Marketing Officer (CMO)',
+    department: 'การตลาดและสร้างสรรค์แบรนด์',
+    image: '9.jpg',
+    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+    icon: TrendingUp,
+    quote: 'ไอเดียที่ไม่หยุดนิ่ง และการสื่อสารที่ตรงใจ คือกุญแจชนะใจลูกค้ายุคดิจิทัล',
+    bio: 'นักกลยุทธ์การตลาดสายสร้างสรรค์ผู้เข้าถึงอินไซต์ของผู้บริโภค ถนัดการทำแคมเปญดิจิทัลและสร้างการรับรู้แบรนด์ ให้เป็นที่จดจำอย่างกว้างขวาง',
+    responsibilities: [
+      'วางแผนแคมเปญการตลาดดิจิทัลและคอนเทนต์สร้างสรรค์',
+      'วิเคราะห์พฤติกรรมผู้บริโภคและเทรนด์ตลาดเพื่อนำเสนอไอเดียใหม่',
+      'บริหารช่องทางสื่อโซเชียลมีเดียและการประชาสัมพันธ์ภาพลักษณ์'
+    ],
+    stats: { reach: '2.5M+', campaignROI: '320%', experience: '5 ปี' }
+  },
+  {
+    id: 5,
+    name: 'นายปรัชชวิน ตันหยง (คุณพุ่ม)',
+    englishName: 'Thanakrit Chaicharoen',
+    role: 'ฝ่าย IT',
+    roleEn: 'Chief Technology Officer (CTO)',
+    department: 'เทคโนโลยีและพัฒนาระบบ',
+    image: '10.jpg',
+    badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+    icon: Cpu,
+    quote: 'เทคโนโลยีที่ดีที่สุดคือเทคโนโลยีที่ตอบโจทย์และแก้ปัญหาให้ผู้ใช้งานได้จริง',
+    bio: 'นักพัฒนาระบบสายลุย ผู้หลงใหลในเทคโนโลยีใหม่ๆ ดูแลโครงสร้างพื้นฐานไอที ระบบความปลอดภัย และพัฒนาดิจิทัลโซลูชัน ให้พร้อมใช้งานตลอด 24 ชั่วโมง',
+    responsibilities: [
+      'ออกแบบและพัฒนาสถาปัตยกรรมระบบเว็บและซอฟต์แวร์ของบริษัท',
+      'ดูแลความปลอดภัยของข้อมูล (Cybersecurity) และ Cloud Infrastructure',
+      'นำเทคโนโลยี AI และ Automation มาประยุกต์ใช้เพิ่มประสิทธิภาพ'
+    ],
+    stats: { uptime: '99.99%', codeCommits: '1.2k', experience: '6 ปี' }
+  }
+];
 
-        .footer-note {
-            position: absolute;
-            bottom: 20px;
-            font-family: 'Mali', cursive;
-            font-size: 0.95rem;
-            color: #172c66;
-            opacity: 0.8;
-            background: rgba(255, 255, 255, 0.6);
-            padding: 4px 12px;
-            border-radius: 12px;
-        }
+export default function App() {
+  const [activeTab, setActiveTab] = useState('gallery'); // 'gallery', 'about', 'github'
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [autoplay, setAutoplay] = useState(true);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL');
 
-        #root {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🏡 บริษัท สบายดีสบายใจนอนอยู่บ้าน จำกัด</h1>
-        <p>✨ สโลแกน: ทำน้อยได้มาก ไม่ทำเลย... สบายใจสุด! ✨</p>
-    </div>
+  const n = TEAM_MEMBERS.length;
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const lockRef = useRef(false);
 
-    <div id="root"></div>
+  // Carousel transition function
+  const step = useCallback((dir) => {
+    if (lockRef.current) return;
+    lockRef.current = true;
+    setTimeout(() => { lockRef.current = false; }, 400);
+    setActiveSlide((curr) => (((curr + dir) % n) + n) % n);
+  }, [n]);
 
-    <div class="footer-note">💡 เลื่อนขวา-ซ้าย เพื่อส่องสมาชิกสายชิลประจำบ้าน</div>
+  // Autoplay timer effect
+  useEffect(() => {
+    if (!autoplay || activeTab !== 'gallery') return;
+    const interval = setInterval(() => step(1), 3500);
+    return () => clearInterval(interval);
+  }, [autoplay, step, activeTab]);
 
-    <!-- React and Babel CDNs -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  // Pointer drag interactions
+  const handlePointerDown = (e) => {
+    isDragging.current = true;
+    dragStartX.current = e.clientX;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
 
-    <script type="text/babel">
-        const { useState, useEffect, useCallback, useRef } = React;
+  const handlePointerUp = (e) => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch (err) {
+      // Ignore capture release error
+    }
+    const delta = e.clientX - dragStartX.current;
+    if (Math.abs(delta) > 40) {
+      step(delta > 0 ? -1 : 1);
+    }
+  };
 
-        // ข้อมูลทีมงาน 5 คน พร้อมตำแหน่งงานปั่นๆ สายชิล
-        const DEFAULT_SLIDES = [
-            {
-                image: { src: "input_file_0.png" },
-                title: "🛋️\nตำแหน่ง: ประธานสายโพสท่านั่งโซฟา\n(เน้นนั่งหล่อ ไม่เน้นทำงาน)",
-            },
-            {
-                image: { src: "input_file_1.png" },
-                title: "☀️\nตำแหน่ง: ผู้จัดการฝ่ายกดดันคนอื่นด้วยรอยยิ้มสดใส\n(ยิ้มหวานแต่งานไม่เดิน)",
-            },
-            {
-                image: { src: "input_file_2.png" },
-                title: "👅\nตำแหน่ง: หัวหน้าฝ่ายตรวจความพร้อมของลิ้น\n(แลบลิ้นเช็คความพร้อมก่อนเข้าประชุม)",
-            },
-            {
-                image: { src: "input_file_3.png" },
-                title: "👀\nตำแหน่ง: Director ฝ่ายมองบนและจับผิดประธาน\n(คอยมองแรงเวลาประธานเริ่มอู้งาน)",
-            },
-            {
-                image: { src: "input_file_4.png" },
-                title: "☕\nตำแหน่ง: ผู้แบกบริษัทด้วยการนั่งชิลหลบมุม\n(เน้นล่องหน ไร้ตัวตนแต่จิ้มกาแฟเพลิน)",
-            },
-        ];
+  const activeMember = TEAM_MEMBERS[activeSlide];
 
-        const COMPONENT_DEFAULTS = {
-            slides: DEFAULT_SLIDES,
-            cardWidth: 380,
-            cardHeight: 460,
-            radius: 5,
-            tilt: 14,
-            sideTilt: 6,
-            gap: 9,
-            opacity: 65,
-            autoplay: false,
-            autoplayDirection: "rightToLeft",
-            transition: {
-                type: "tween",
-                duration: 0.6,
-                delay: 2.5,
-                ease: [0.22, 1, 0.36, 1],
-            },
-            showTitle: true,
-            titleFont: {
-                fontFamily: "Mali",
-                fontSize: "19px",
-                letterSpacing: "0em",
-                lineHeight: "1.35em",
-            },
-            titleColor: "#ffffff",
-            titlePosition: {
-                position: "bottomLeft",
-                paddingLeft: 20,
-                paddingRight: 20,
-                paddingTop: 20,
-                paddingBottom: 20,
-            },
-        };
+  const copyDeployScript = () => {
+    const script = `npm run build && npx gh-pages -d dist`;
+    navigator.clipboard.writeText(script);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
 
-        const PERSPECTIVE = 1600;
-        const SCALE_STEP = 0.16;
-        const MAX_VISIBLE = 2;
-        const DEPTH = 240;
+  return (
+    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-purple-500 selection:text-white flex flex-col justify-between overflow-x-hidden">
+      
+      {}
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-neutral-950/80 border-b border-neutral-800/80">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          
+          {/* Logo & Company Name */}
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('gallery')}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <div className="w-full h-full bg-neutral-950 rounded-[10px] flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-purple-400" />
+              </div>
+            </div>
+            <div>
+              <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-purple-400">
+                SabaiDiSabaichaiNoNYuBan
+              </span>
+              <p className="text-[10px] sm:text-xs text-neutral-400 font-medium">สบายดีสบายใจนอนอยู่บ้าน จำกัด</p>
+            </div>
+          </div>
 
-        function cssTransition(t) {
-            const dur = t && typeof t.duration === 'number' ? t.duration : 0.6;
-            let ease = "cubic-bezier(0.22, 1, 0.36, 1)";
-            const e = t?.ease;
-            if (Array.isArray(e) && e.length === 4) {
-                ease = `cubic-bezier(${e[0]}, ${e[1]}, ${e[2]}, ${e[3]})`;
-            } else if (typeof e === "string") {
-                const map = {
-                    linear: "linear",
-                    easeIn: "ease-in",
-                    easeOut: "ease-out",
-                    easeInOut: "ease-in-out",
-                };
-                ease = map[e] || "ease";
-            }
-            return { dur, ease };
-        }
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 bg-neutral-900/90 p-1.5 rounded-full border border-neutral-800">
+            <button
+              onClick={() => setActiveTab('gallery')}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
+                activeTab === 'gallery'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              3D Team Gallery
+            </button>
+            <button
+              onClick={() => setActiveTab('about')}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
+                activeTab === 'about'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              เกี่ยวกับบริษัท
+            </button>
+            <button
+              onClick={() => setActiveTab('github')}
+              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
+                activeTab === 'github'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
+              }`}
+            >
+              <Github className="w-3.5 h-3.5" />
+              GitHub Guide
+            </button>
+          </nav>
 
-        function Smooth3DSlideshow(props) {
-            props = { ...COMPONENT_DEFAULTS, ...props };
-            const {
-                slides,
-                cardWidth,
-                cardHeight,
-                radius,
-                tilt,
-                sideTilt,
-                gap,
-                opacity,
-                transition,
-                autoplay,
-                autoplayDirection,
-                showTitle,
-                titleFont,
-                titleColor,
-                titlePosition,
-                style,
-            } = props;
+          {/* Action Quick Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setActiveTab('github')}
+              className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs text-neutral-300 transition-colors"
+            >
+              <Github className="w-4 h-4 text-purple-400" />
+              <span>Deploy to GitHub</span>
+            </button>
+          </div>
+        </div>
 
-            const tp = titlePosition || {};
-            const corner = tp.position || "bottomLeft";
-            const isTop = corner === "topLeft" || corner === "topRight";
-            const isRight = corner === "topRight" || corner === "bottomRight";
-            const padLeft = tp.paddingLeft ?? 20;
-            const padRight = tp.paddingRight ?? 20;
-            const padTop = tp.paddingTop ?? 20;
-            const padBottom = tp.paddingBottom ?? 20;
+        {/* Mobile Navigation Bar */}
+        <div className="flex md:hidden border-t border-neutral-800 bg-neutral-900/90 px-2 py-1.5 justify-around">
+          <button
+            onClick={() => setActiveTab('gallery')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+              activeTab === 'gallery' ? 'bg-purple-600 text-white' : 'text-neutral-400'
+            }`}
+          >
+            Gallery
+          </button>
+          <button
+            onClick={() => setActiveTab('about')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+              activeTab === 'about' ? 'bg-purple-600 text-white' : 'text-neutral-400'
+            }`}
+          >
+            About
+          </button>
+          <button
+            onClick={() => setActiveTab('github')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
+              activeTab === 'github' ? 'bg-purple-600 text-white' : 'text-neutral-400'
+            }`}
+          >
+            GitHub
+          </button>
+        </div>
+      </header>
 
-            const list = slides && slides.length ? slides : DEFAULT_SLIDES;
-            const n = list.length;
-            const loop = true;
-            const [active, setActive] = useState(0);
+      {}
+      <main className="flex-1">
+        {activeTab === 'gallery' && (
+          <div>
+            {/* Gallery Intro Banner */}
+            <div className="pt-8 pb-4 text-center px-4 max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium mb-3">
+                <Sparkles className="w-3.5 h-3.5" /> Powered by Agentic UI Modern 3D Carousel
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2">
+                บุคลากรทรงคุณค่าแห่ง <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">SabaiDiSabaichaiNoNYuBan</span>
+              </h1>
+              <p className="text-neutral-400 text-xs sm:text-sm">
+                ทีมงานคุณภาพผู้ขับเคลื่อนความสำเร็จทั้ง 5 แผนกหลัก สัมผัสประสบการณ์การรับชมแบบ 3D Interactive Slider
+              </p>
+            </div>
 
-            // Drag State Tracker Variables
-            const dragStartX = useRef(0);
-            const isDragging = useRef(false);
-            const dragThreshold = 50;
-
-            useEffect(() => {
-                setActive((a) => Math.max(0, Math.min(n - 1, a)));
-            }, [n]);
-
-            const moveDur = transition && typeof transition.duration === "number" ? transition.duration : 0.6;
-            const lockRef = useRef(false);
-            
-            const lock = useCallback(() => {
-                lockRef.current = true;
-                window.setTimeout(() => {
-                    lockRef.current = false;
-                }, Math.max(50, moveDur * 1000));
-            }, [moveDur]);
-
-            const step = useCallback((dir) => {
-                if (lockRef.current) return;
-                lock();
-                setActive((a) => (((a + dir) % n) + n) % n);
-            }, [n, lock]);
-
-            const handleCardClick = useCallback((i) => {
-                if (autoplay || lockRef.current) return;
-                lock();
-                setActive((a) => (i === a ? (a + 1) % n : i));
-            }, [autoplay, n, lock]);
-
-            // Pointer interaction functions for Drag & Swipe
-            const handlePointerDown = (e) => {
-                if (autoplay || lockRef.current) return;
-                isDragging.current = true;
-                dragStartX.current = e.clientX;
-                e.currentTarget.setPointerCapture(e.pointerId);
-            };
-
-            const handlePointerMove = (e) => {
-                if (!isDragging.current) return;
-            };
-
-            const handlePointerUp = (e) => {
-                if (!isDragging.current) return;
-                isDragging.current = false;
-                e.currentTarget.releasePointerCapture(e.pointerId);
-
-                const dragDistance = e.clientX - dragStartX.current;
-
-                if (Math.abs(dragDistance) > dragThreshold) {
-                    if (dragDistance > 0) {
-                        step(-1);
-                    } else {
-                        step(1);
-                    }
-                }
-            };
-
-            const delay = transition && typeof transition.delay === "number" ? transition.delay : 2.5;
-            
-            useEffect(() => {
-                if (!autoplay || n < 2) return;
-                const ms = Math.max(0.3, delay) * 1000;
-                const dir = autoplayDirection === "leftToRight" ? -1 : 1;
-                const id = window.setInterval(() => step(dir), ms);
-                return () => window.clearInterval(id);
-            }, [autoplay, autoplayDirection, delay, n, step]);
-
-            const onKeyDown = useCallback((e) => {
-                if (e.key === "ArrowRight") {
-                    e.preventDefault();
-                    step(1);
-                } else if (e.key === "ArrowLeft") {
-                    e.preventDefault();
-                    step(-1);
-                }
-            }, [step]);
-
-            const { dur, ease } = cssTransition(transition);
-            const transitionCss = `transform ${dur}s ${ease}, opacity ${dur}s ${ease}`;
-
-            const effectiveRadius = (Math.max(0, Math.min(20, radius)) / 20) * (Math.min(cardWidth, cardHeight) / 2);
-            const dim = 1 - Math.max(0, Math.min(100, opacity)) / 100;
-
-            const rootStyle = {
-                ...(style || {}),
-                position: "relative",
-                width: "100%",
-                height: "100%",
-                minWidth: 320,
-                minHeight: 360,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                perspective: `${PERSPECTIVE}px`,
-                overflow: "hidden",
-                outline: "none",
-                touchAction: "none",
-                cursor: autoplay ? "default" : "grab"
-            };
-
-            return (
-                <div
-                    style={rootStyle}
-                    tabIndex={0}
-                    role="group"
-                    aria-roledescription="carousel"
-                    onKeyDown={onKeyDown}
-                    onPointerDown={handlePointerDown}
-                    onPointerMove={handlePointerMove}
-                    onPointerUp={handlePointerUp}
-                    onPointerCancel={handlePointerUp}
+            {/* Quick Department Filter Selector */}
+            <div className="flex flex-wrap justify-center gap-2 px-4 mb-4">
+              <button
+                onClick={() => setSelectedRoleFilter('ALL')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  selectedRoleFilter === 'ALL'
+                    ? 'bg-neutral-200 text-neutral-900 font-semibold'
+                    : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'
+                }`}
+              >
+                ทั้งหมด (5)
+              </button>
+              {TEAM_MEMBERS.map((m, idx) => (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    setSelectedRoleFilter(m.role);
+                    setActiveSlide(idx);
+                  }}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    activeSlide === idx
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
+                      : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'
+                  }`}
                 >
-                    <div
+                  {m.role}
+                </button>
+              ))}
+            </div>
+
+            {}
+            <div className="relative my-4">
+              <div
+                tabIndex={0}
+                role="group"
+                aria-label="3D Team Carousel"
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                className="relative w-full h-[420px] sm:h-[480px] flex items-center justify-center overflow-hidden bg-neutral-950 text-white select-none cursor-grab active:cursor-grabbing outline-none"
+                style={{ perspective: 1600 }}
+              >
+                {/* Background ambient glow effect */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/15 rounded-full filter blur-[100px] pointer-events-none" />
+
+                {/* 3D Container */}
+                <div
+                  className="relative pointer-events-none"
+                  style={{ width: 320, height: 380, transformStyle: 'preserve-3d' }}
+                >
+                  {TEAM_MEMBERS.map((slide, i) => {
+                    let rel = i - activeSlide;
+                    if (rel > n / 2) rel -= n;
+                    if (rel < -n / 2) rel += n;
+
+                    const ax = Math.abs(rel);
+                    const isVisible = ax <= 2;
+                    const isActive = rel === 0;
+                    const scale = Math.max(0.4, 1 - ax * 0.16);
+                    const tx = rel * 200;
+                    const tz = -ax * 220;
+                    const ry = -rel * 14;
+
+                    return (
+                      <div
+                        key={slide.id}
+                        onClick={() => !isDragging.current && setActiveSlide(i)}
+                        className={`absolute left-1/2 top-1/2 overflow-hidden rounded-2xl bg-neutral-900 border ${
+                          isActive ? 'border-purple-500/80 shadow-2xl shadow-purple-500/20 ring-2 ring-purple-500/50' : 'border-neutral-800 shadow-xl'
+                        } transition-all duration-500 ease-out cursor-pointer`}
                         style={{
-                            position: "relative",
-                            width: cardWidth,
-                            height: cardHeight,
-                            transformStyle: "preserve-3d",
-                            pointerEvents: "none"
+                          width: 320,
+                          height: 380,
+                          transform: `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
+                          opacity: isVisible ? 1 : 0,
+                          pointerEvents: isVisible ? 'auto' : 'none',
+                          transformStyle: 'preserve-3d',
                         }}
-                    >
-                        {list.map((slide, i) => {
-                            let rel = i - active;
-                            if (loop) {
-                                if (rel > n / 2) rel -= n;
-                                if (rel < -n / 2) rel += n;
-                            }
-                            const ax = Math.abs(rel);
-                            const visible = ax <= MAX_VISIBLE;
-                            const isActive = rel === 0;
-                            const sc = Math.max(0.4, 1 - ax * SCALE_STEP);
-                            const tx = rel * (gap * 30);
-                            const tz = -ax * DEPTH;
-                            const ry = -rel * tilt;
-                            const rz = rel * sideTilt;
-                            const src = slide.image?.src || "";
+                      >
+                        <img
+                          src={slide.image}
+                          alt={slide.name}
+                          draggable={false}
+                          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/30 to-transparent" />
+                        
+                        {/* Member Role Badge */}
+                        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${slide.badgeColor}`}>
+                            {slide.role}
+                          </span>
+                          <span className="text-[10px] text-neutral-300 bg-neutral-950/60 backdrop-blur-sm px-2 py-0.5 rounded">
+                            #{i + 1}
+                          </span>
+                        </div>
 
-                            const cardStyle = {
-                                position: "absolute",
-                                left: "50%",
-                                top: "50%",
-                                width: cardWidth,
-                                height: cardHeight,
-                                borderRadius: 24, // ขอบมนน่ารักสไตล์บ้านๆ
-                                overflow: "hidden",
-                                transformStyle: "preserve-3d",
-                                transformOrigin: "center center",
-                                transform: `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`,
-                                transition: transitionCss,
-                                opacity: visible ? 1 : 0,
-                                pointerEvents: visible && !autoplay ? "auto" : "none",
-                                backgroundColor: "#ffffff",
-                                boxShadow: isActive 
-                                    ? "0 20px 35px rgba(23, 44, 102, 0.25), 0 0 0 4px #ffffff" 
-                                    : "0 10px 20px rgba(0,0,0,0.1)",
-                            };
+                        {/* Title overlay at bottom */}
+                        <div className="absolute bottom-5 left-5 right-5">
+                          <p className="text-xs text-purple-300 font-medium mb-0.5">{slide.roleEn}</p>
+                          <h3 className="text-lg font-bold tracking-tight text-white drop-shadow-md">
+                            {slide.name}
+                          </h3>
+                        </div>
 
-                            return (
-                                <div
-                                    key={i}
-                                    style={cardStyle}
-                                    onClick={(e) => {
-                                        if(!isDragging.current) handleCardClick(i);
-                                    }}
-                                    aria-label={slide.title}
-                                    aria-hidden={!visible}
-                                >
-                                    {src ? (
-                                        <img
-                                            src={src}
-                                            alt={slide.title || ""}
-                                            draggable={false}
-                                            style={{
-                                                position: "absolute",
-                                                inset: 0,
-                                                width: "100%",
-                                                height: "100%",
-                                                objectFit: "cover",
-                                                display: "block",
-                                                userSelect: "none",
-                                                pointerEvents: "none"
-                                            }}
-                                        />
-                                    ) : null}
-
-                                    {showTitle && (
-                                        <React.Fragment>
-                                            <div
-                                                style={{
-                                                    position: "absolute",
-                                                    inset: 0,
-                                                    background: isTop
-                                                        ? "linear-gradient(0deg, rgba(0,0,0,0) 25%, rgba(23,44,102,0.92) 100%)"
-                                                        : "linear-gradient(180deg, rgba(0,0,0,0) 25%, rgba(23,44,102,0.92) 100%)",
-                                                    pointerEvents: "none",
-                                                }}
-                                            />
-
-                                            <div
-                                                style={{
-                                                    position: "absolute",
-                                                    left: padLeft,
-                                                    right: padRight,
-                                                    [isTop ? "top" : "bottom"]: isTop ? padTop : padBottom,
-                                                    textAlign: isRight ? "right" : "left",
-                                                    pointerEvents: "none",
-                                                }}
-                                            >
-                                                <span
-                                                    style={{
-                                                        color: titleColor,
-                                                        fontSize: 19,
-                                                        fontWeight: 600,
-                                                        lineHeight: "1.4em",
-                                                        whiteSpace: "pre-line",
-                                                        textShadow: "0 2px 6px rgba(0,0,0,0.6)",
-                                                        ...(titleFont || {}),
-                                                    }}
-                                                >
-                                                    {slide.title}
-                                                </span>
-                                            </div>
-                                        </React.Fragment>
-                                    )}
-
-                                    <div
-                                        style={{
-                                            position: "absolute",
-                                            inset: 0,
-                                            background: "#172c66",
-                                            opacity: isActive ? 0 : dim,
-                                            transition: `opacity ${dur}s ${ease}`,
-                                            pointerEvents: "none",
-                                        }}
-                                    />
-                                </div>
-                            );
-                        })}
-                    </div>
+                        {/* Dim Overlay for non-active slides */}
+                        <div
+                          className={`absolute inset-0 bg-black transition-opacity duration-500 ${
+                            isActive ? 'opacity-0' : 'opacity-50'
+                          }`}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
-            );
-        }
 
-        // Render Component
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<Smooth3DSlideshow />);
-    </script>
-</body>
-</html>
+                {/* Left / Right Carousel Control Buttons */}
+                <button
+                  onClick={() => step(-1)}
+                  aria-label="Previous Slide"
+                  className="absolute left-4 sm:left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 flex items-center justify-center text-white backdrop-blur-md transition-all hover:scale-110 z-20 shadow-lg"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={() => step(1)}
+                  aria-label="Next Slide"
+                  className="absolute right-4 sm:right-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 flex items-center justify-center text-white backdrop-blur-md transition-all hover:scale-110 z-20 shadow-lg"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                {/* Autoplay & Navigation Controls */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20 bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-800 shadow-xl">
+                  {/* Play / Pause Toggle */}
+                  <button
+                    onClick={() => setAutoplay(!autoplay)}
+                    className="text-neutral-400 hover:text-white transition-colors p-1"
+                    title={autoplay ? 'Pause Autoplay' : 'Start Autoplay'}
+                  >
+                    {autoplay ? <Pause className="w-4 h-4 text-purple-400" /> : <Play className="w-4 h-4 text-emerald-400" />}
+                  </button>
+
+                  <div className="h-3 w-[1px] bg-neutral-700" />
+
+                  {/* Pagination Dots */}
+                  <div className="flex items-center gap-2">
+                    {TEAM_MEMBERS.map((_, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setActiveSlide(i)}
+                        aria-label={`Go to slide ${i + 1}`}
+                        className={`transition-all duration-300 rounded-full cursor-pointer ${
+                          activeSlide === i ? 'w-6 h-2 bg-gradient-to-r from-purple-400 to-indigo-400' : 'w-2 h-2 bg-white/30 hover:bg-white/60'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {}
+            <div className="max-w-4xl mx-auto px-4 py-6">
+              <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+                {/* Decorative background glow */}
+                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-600/10 rounded-full filter blur-[80px]" />
+                
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
+                  {/* Thumbnail / Avatar */}
+                  <div className="md:col-span-4 flex flex-col items-center">
+                    <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-purple-500/40 shadow-xl">
+                      <img
+                        src={activeMember.image}
+                        alt={activeMember.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <span className={`absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${activeMember.badgeColor}`}>
+                        {activeMember.role}
+                      </span>
+                    </div>
+                    <p className="text-xs text-neutral-400 mt-3 font-mono">ID: SDB-2026-00{activeMember.id}</p>
+                  </div>
+
+                  {/* Member Details */}
+                  <div className="md:col-span-8 flex flex-col justify-center">
+                    <div className="flex items-center gap-3 mb-1">
+                      {React.createElement(activeMember.icon, { className: "w-5 h-5 text-purple-400" })}
+                      <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">{activeMember.department}</span>
+                    </div>
+                    
+                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{activeMember.name}</h2>
+                    <p className="text-sm text-neutral-400 font-medium mb-4">{activeMember.englishName} — <span className="text-neutral-300">{activeMember.roleEn}</span></p>
+
+                    {/* Member Quote */}
+                    <div className="bg-neutral-950/60 rounded-xl p-3.5 border border-neutral-800/80 italic text-xs sm:text-sm text-neutral-300 mb-4 border-l-4 border-l-purple-500">
+                      "{activeMember.quote}"
+                    </div>
+
+                    {/* Member Bio */}
+                    <p className="text-xs sm:text-sm text-neutral-400 mb-4 leading-relaxed">
+                      {activeMember.bio}
+                    </p>
+
+                    {/* Responsibilities */}
+                    <div>
+                      <h4 className="text-xs font-semibold text-neutral-200 mb-2 flex items-center gap-1.5">
+                        <Briefcase className="w-3.5 h-3.5 text-purple-400" /> ความรับผิดชอบหลัก:
+                      </h4>
+                      <ul className="space-y-1.5">
+                        {activeMember.responsibilities.map((resp, idx) => (
+                          <li key={idx} className="text-xs text-neutral-300 flex items-start gap-2">
+                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                            <span>{resp}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {}
+        {activeTab === 'about' && (
+          <div className="max-w-4xl mx-auto px-4 py-10">
+            <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
+              
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-neutral-800">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+                  <Building2 className="w-8 h-8" />
+                </div>
+                <div>
+                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">SabaiDiSabaichaiNoNYuBan</h1>
+                  <p className="text-sm text-purple-400">บริษัท สบายดีสบายใจนอนอยู่บ้าน จำกัด</p>
+                </div>
+              </div>
+
+              {/* Company Vision & Concept Briefing */}
+              <div className="space-y-6 text-sm text-neutral-300 leading-relaxed">
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-amber-400" /> Concept & แนวคิดในการออกแบบ
+                  </h3>
+                  <p className="text-neutral-400 leading-relaxed">
+                    โปรเจกต์นี้ได้รับการดีไซน์ขึ้นเพื่อนำเสนอโครงสร้างองค์กรยุคใหม่ของ <b>SabaiDiSabaichaiNoNYuBan</b> โดยประยุกต์ใช้เทคโนโลยี UI ล่าสุดจาก <b>Agentic UI Framework</b> ด้วยรูปแบบ <b>3D Animate Slider Gallery</b> ซึ่งมอบประสบการณ์การเข้าถึงข้อมูลตัวบุคคลแบบ Interactive สามารถปรับหมุน เลื่อน drag/swipe และแสดงรายละเอียดเชิงลึกของคณะผู้บริหารและฝ่ายต่างๆ ได้อย่างมีประสิทธิภาพ
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
+                  <div className="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+                    <h4 className="font-bold text-purple-300 mb-1">วิสัยทัศน์ (Vision)</h4>
+                    <p className="text-xs text-neutral-400">
+                      ก้าวสู่การเป็นผู้นำด้านนวัตกรรมองค์กรที่ทำงานได้อย่างมีประสิทธิภาพสูงสุด ควบคู่ไปกับความสมดุลและความสุขของบุคลากรตามแนวคิด "สบายดีสบายใจ"
+                    </p>
+                  </div>
+                  <div className="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
+                    <h4 className="font-bold text-indigo-300 mb-1">พันธกิจ (Mission)</h4>
+                    <p className="text-xs text-neutral-400">
+                      ขับเคลื่อนธุรกิจด้วยขีดความสามารถของบุคลากรทั้ง 5 ฝ่ายหลัก นำเทคโนโลยีทันสมัยมาประยุกต์ใช้ในการทำงานแบบยืดหยุ่นและไร้รอยต่อ
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-lg font-bold text-white mb-3">รายชื่อคณะผู้บริหารและหัวหน้าฝ่าย (Organizational Structure)</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {TEAM_MEMBERS.map((member) => (
+                      <div key={member.id} className="bg-neutral-950 p-3.5 rounded-xl border border-neutral-800 flex items-center gap-3">
+                        <img src={member.image} alt={member.name} className="w-12 h-12 rounded-lg object-cover" />
+                        <div>
+                          <p className="text-xs font-bold text-white">{member.name}</p>
+                          <p className="text-[11px] text-purple-400">{member.role}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {}
+        {activeTab === 'github' && (
+          <div className="max-w-4xl mx-auto px-4 py-10">
+            <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
+              
+              <div className="flex items-center justify-between mb-6 pb-6 border-b border-neutral-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center text-white border border-neutral-700">
+                    <Github className="w-6 h-6 text-purple-400" />
+                  </div>
+                  <div>
+                    <h1 className="text-2xl font-extrabold text-white">คู่มือการนำขึ้น GitHub Pages / Vercel</h1>
+                    <p className="text-xs text-neutral-400">GitHub Deployment Guide for SabaiDiSabaichaiNoNYuBan Project</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Step by step deployment tutorial */}
+              <div className="space-y-6 text-sm text-neutral-300">
+                
+                {/* Step 1 */}
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
+                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
+                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">1</span>
+                    ขั้นตอนที่ 1: เตรียมโค้ดและสร้าง Repository บน GitHub
+                  </div>
+                  <ol className="list-disc list-inside text-xs text-neutral-400 space-y-1 pl-2">
+                    <li>เข้าเว็บไซต์ <a href="https://github.com" target="_blank" rel="noreferrer" className="text-purple-400 underline">GitHub.com</a> และล็อกอินเข้าสู่ระบบ</li>
+                    <li>กดปุ่ม <b>New Repository</b> ตั้งชื่อคลังโค้ด เช่น <code className="bg-neutral-900 px-1.5 py-0.5 rounded text-purple-300">sabaidisabaichai-team</code></li>
+                    <li>เลือกตั้งค่าเป็น <b>Public</b> แล้วกด <b>Create repository</b></li>
+                  </ol>
+                </div>
+
+                {/* Step 2 */}
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
+                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
+                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">2</span>
+                    ขั้นตอนที่ 2: ติดตั้ง `gh-pages` Package สำหรับ Deploy
+                  </div>
+                  <p className="text-xs text-neutral-400 mb-2">รันคำสั่งด้านล่างเพื่อติดตั้ง gh-pages package เพิ่มเติมในโปรเจกต์ React / Vite:</p>
+                  <div className="bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-xs text-emerald-400 flex items-center justify-between">
+                    <code>npm install gh-pages --save-dev</code>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
+                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
+                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">3</span>
+                    ขั้นตอนที่ 3: เพิ่ม Script บน package.json
+                  </div>
+                  <p className="text-xs text-neutral-400 mb-2">เปิดไฟล์ <code className="bg-neutral-900 px-1.5 py-0.5 rounded text-purple-300">package.json</code> แล้วเพิ่ม <code className="text-amber-300">homepage</code> และคำสั่ง <code className="text-amber-300">deploy</code> ดังนี้:</p>
+                  <pre className="bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-[11px] text-neutral-300 overflow-x-auto">
+{`"homepage": "https://<your-github-username>.github.io/sabaidisabaichai-team",
+"scripts": {
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+}`}
+                  </pre>
+                </div>
+
+                {/* Step 4 */}
+                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
+                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
+                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">4</span>
+                    ขั้นตอนที่ 4: รันคำสั่ง Publish ไปยัง GitHub Pages
+                  </div>
+                  <div className="flex items-center justify-between bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-xs">
+                    <code className="text-emerald-400">npm run deploy</code>
+                    <button
+                      onClick={copyDeployScript}
+                      className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 rounded text-white text-[11px] flex items-center gap-1 transition-colors"
+                    >
+                      {copiedCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                      {copiedCode ? 'คัดลอกแล้ว!' : 'คัดลอกคำสั่ง'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Extra note for Vercel */}
+                <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
+                  <div>
+                    <b>ทางเลือกเสริม (Vercel / Netlify Deployment):</b>
+                    <p className="text-neutral-400 mt-1">
+                      สามารถเชื่อมต่อ GitHub Repository นี้เข้ากับ Vercel.com ได้แบบอัตโนมัติ (Zero Configuration) โดยเพียงแค่กด Import Project บน Vercel ระบบจะทำการ Build และสร้างลิงก์เว็บไซต์ให้ทันที
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        )}
+      </main>
+
+      {}
+      <footer className="border-t border-neutral-800/80 bg-neutral-950 py-6 text-center text-xs text-neutral-500">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p>© 2026 SabaiDiSabaichaiNoNYuBan Co., Ltd. All rights reserved.</p>
+          <p className="flex items-center gap-1">
+            Built with <span className="text-purple-400">Agentic UI 3D Carousel</span> & React
+          </p>
+        </div>
+      </footer>
+
+    </div>
+  );
+}
