@@ -1,691 +1,283 @@
+'use client';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Play, 
-  Pause, 
-  Github, 
-  Sparkles, 
-  Building2, 
-  Users, 
-  BookOpen, 
-  Briefcase, 
-  ShieldCheck, 
-  Cpu, 
-  TrendingUp, 
-  DollarSign, 
-  Award,
-  CheckCircle,
-  Copy,
-  ExternalLink,
-  Info
-} from 'lucide-react';
 
-const TEAM_MEMBERS = [
+// ==========================================
+// ข้อมูลสมาชิกทีมงานทั้ง 5 ท่าน (SabaiDiSabaichaiNoNYuBan)
+// ==========================================
+const TEAM_SLIDES = [
   {
     id: 1,
-    name: 'นางสาวรดา นกเสวก (คุณข้าว)',
-    englishName: 'Sirinthorn Wises-sombat',
-    role: 'ประธานบริษัท',
-    roleEn: 'Chief Executive Officer (CEO)',
-    department: 'ผู้บริหารระดับสูง',
-    image: '6.jpg',
-    badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-    icon: Award,
-    quote: 'วิสัยทัศน์ที่กว้างไกล คือรากฐานของความสำเร็จที่มั่นคงในสภาวะเศรษฐกิจยุคใหม่',
-    bio: 'ผู้นำวิสัยทัศน์ไกล มีประสบการณ์บริหารจัดการองค์กรให้เติบโตอย่างยั่งยืน มุ่งมั่นสร้างบรรยากาศการทำงานที่มีความสุขและเปิดกว้างสำหรับความคิดสร้างสรรค์ใหม่ๆ',
-    responsibilities: [
-      'กำหนดทิศทางยุทธศาสตร์และเป้าหมายระยะยาวของบริษัท',
-      'ดูแลความสัมพันธ์ระหว่างผู้ถือหุ้นและพาร์ทเนอร์ธุรกิจชั้นนำ',
-      'อนุมัตินโยบายหลักและการลงทุนสำคัญของ SabaiDiSabaichaiNoNYuBan'
-    ],
-    stats: { projects: '45+', experience: '10 ปี', rating: '4.9/5' }
+    name: 'นายปรัชชวิน ตันหยง',
+    role: 'ประธานบริษัท (CEO)',
+    company: 'SabaiDiSabaichaiNoNYuBan',
+    bio: 'ผู้นำวิศวกรรมองค์กร วิสัยทัศน์กว้างไกล ขับเคลื่อนบริษัท SabaiDiSabaichaiNoNYuBan สู่ความสำเร็จด้วยนวัตกรรม',
+    detailBio: 'วางทิศทางยุทธศาสตร์องค์กร สร้างวัฒนธรรมการทำงานที่เข้มแข็ง บริหารความเสี่ยง และนำพาบริษัท SabaiDiSabaichaiNoNYuBan เติบโตอย่างยั่งยืน',
+    skills: ['Executive Leadership', 'Strategic Planning', 'Business Vision'],
+    image: { src: 'images/10.jpg' },
   },
   {
     id: 2,
-    name: 'นางสาวสุจิตราภรณ์ แสงหา (คุณฮาย)',
-    englishName: 'Nichapat Maneerat',
-    role: 'ฝ่ายการเงิน',
-    roleEn: 'Chief Financial Officer (CFO)',
-    department: 'การเงินและบัญชี',
-    image: '7.jpg',
-    badgeColor: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
-    icon: DollarSign,
-    quote: 'การวางแผนทางการเงินที่รอบคอบ คือเกราะป้องกันความเสี่ยงและพลังขับเคลื่อนบริษัท',
-    bio: 'ผู้เชี่ยวชาญด้านการบริหารงบประมาณ วางแผนภาษี และวิเคราะห์ความคุ้มค่าทางการลงทุน มีความละเอียดแม่นยำในการจัดสรรทรัพยากรเพื่อให้เกิดประโยชน์สูงสุด',
-    responsibilities: [
-      'วางแผนและกำกับดูแลรายรับ-รายจ่ายของบริษัทอย่างใกล้ชิด',
-      'จัดทำรายงานทางการเงินและการวิเคราะห์กระแสเงินสดประจำเดือน',
-      'บริหารจัดการความเสี่ยงด้านการลงทุนและงบประมาณดำเนินงาน'
-    ],
-    stats: { accuracy: '99.9%', budgetManaged: '฿50M+', experience: '7 ปี' }
+    name: 'นางสาวรดา นกเสวก',
+    role: 'ฝ่ายการเงิน (CFO)',
+    company: 'SabaiDiSabaichaiNoNYuBan',
+    bio: 'ผู้เชี่ยวชาญด้านการวางแผนการเงิน จัดสรรงบประมาณของ SabaiDiSabaichaiNoNYuBan อย่างรัดกุมและเกิดประโยชน์สูงสุด',
+    detailBio: 'กำกับดูแลระบบบัญชี การเงิน การลงทุน วิเคราะห์ต้นทุน และจัดทำรายงานทางการเงินเพื่อการตัดสินใจเชิงกลยุทธ์ของบริษัท',
+    skills: ['Financial Analysis', 'Budgeting', 'Risk Management'],
+    image: { src: 'images/6.jpg' },
   },
   {
     id: 3,
-    name: 'นางสาวลัดดาวัลย์ ราหุละ (คุณจิว)',
-    englishName: 'Chananthida Wongsawat',
-    role: 'ฝ่ายปฏิบัติการ',
-    roleEn: 'Chief Operating Officer (COO)',
-    department: 'บริหารจัดการและปฏิบัติการ',
-    image: '8.jpg',
-    badgeColor: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    icon: ShieldCheck,
-    quote: 'การประสานงานที่ราบรื่นส่งผลให้ทุกโครงการบรรลุเป้าหมายได้อย่างมีประสิทธิภาพ',
-    bio: 'หัวเรือใหญ่ด้านกระบวนการทำงาน ควบคุมคุณภาพ และเชื่อมโยงทุกแผนกเข้าด้วยกันอย่างลงตัว มุ่งเน้นการปรับปรุงประสิทธิภาพกระบวนการ (Process Optimization)',
-    responsibilities: [
-      'ควบคุมดูแลมาตรฐานการทำงานประจำวันให้ตรงตาม KPI',
-      'ปรับปรุง workflow งานภายในเพื่อลดระยะเวลาและเพิ่มผลผลิต',
-      'ประสานงานระหว่างฝ่ายเพื่อแก้ไขปัญหาหน้างานอย่างรวดเร็ว'
-    ],
-    stats: { efficiency: '+40%', processDone: '120+', experience: '6 ปี' }
+    name: 'นางสาวสุจิตราภรณ์ หาแสง',
+    role: 'ฝ่ายปฏิบัติการ (COO)',
+    company: 'SabaiDiSabaichaiNoNYuBan',
+    bio: 'ดูแลการบริหารงานภายในองค์กร SabaiDiSabaichaiNoNYuBan ให้เป็นไปอย่างมีประสิทธิภาพและราบรื่น',
+    detailBio: 'บริหารจัดการกระบวนการทำงานภายใน ยกระดับ Productivity ของทีมงาน ประสานงานระหว่างแผนก และแก้ไขปัญหาเฉพาะหน้าอย่างมืออาชีพ',
+    skills: ['Operations Management', 'Process Optimization', 'Problem Solving'],
+    image: { src: 'images/7.jpg' },
   },
   {
     id: 4,
-    name: 'นายเกรียงศักดิ์ ปานสวย (คุณแม็ค)',
-    englishName: 'Pannathorn Srisuk',
-    role: 'ฝ่ายการตลาด',
-    roleEn: 'Chief Marketing Officer (CMO)',
-    department: 'การตลาดและสร้างสรรค์แบรนด์',
-    image: '9.jpg',
-    badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-    icon: TrendingUp,
-    quote: 'ไอเดียที่ไม่หยุดนิ่ง และการสื่อสารที่ตรงใจ คือกุญแจชนะใจลูกค้ายุคดิจิทัล',
-    bio: 'นักกลยุทธ์การตลาดสายสร้างสรรค์ผู้เข้าถึงอินไซต์ของผู้บริโภค ถนัดการทำแคมเปญดิจิทัลและสร้างการรับรู้แบรนด์ ให้เป็นที่จดจำอย่างกว้างขวาง',
-    responsibilities: [
-      'วางแผนแคมเปญการตลาดดิจิทัลและคอนเทนต์สร้างสรรค์',
-      'วิเคราะห์พฤติกรรมผู้บริโภคและเทรนด์ตลาดเพื่อนำเสนอไอเดียใหม่',
-      'บริหารช่องทางสื่อโซเชียลมีเดียและการประชาสัมพันธ์ภาพลักษณ์'
-    ],
-    stats: { reach: '2.5M+', campaignROI: '320%', experience: '5 ปี' }
+    name: 'นางสาวลัดดาวัลย์ ราหุละ',
+    role: 'ฝ่ายการตลาด (CMO)',
+    company: 'SabaiDiSabaichaiNoNYuBan',
+    bio: 'ขับเคลื่อนแบรนด์และสร้างการเติบโตของฐานลูกค้า ขยายตลาดให้เติบโตอย่างต่อเนื่อง',
+    detailBio: 'สร้างแคมเปญการตลาดล้ำสมัย ทำการวิจัยพฤติกรรมผู้บริโภค บริหารช่องทางการสื่อสารแบรนด์ และเพิ่มยอดขายทะลุเป้าหมาย',
+    skills: ['Digital Marketing', 'Brand Strategy', 'Growth Marketing'],
+    image: { src: 'images/8.jpg' },
   },
   {
     id: 5,
-    name: 'นายปรัชชวิน ตันหยง (คุณพุ่ม)',
-    englishName: 'Thanakrit Chaicharoen',
-    role: 'ฝ่าย IT',
-    roleEn: 'Chief Technology Officer (CTO)',
-    department: 'เทคโนโลยีและพัฒนาระบบ',
-    image: '10.jpg',
-    badgeColor: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-    icon: Cpu,
-    quote: 'เทคโนโลยีที่ดีที่สุดคือเทคโนโลยีที่ตอบโจทย์และแก้ปัญหาให้ผู้ใช้งานได้จริง',
-    bio: 'นักพัฒนาระบบสายลุย ผู้หลงใหลในเทคโนโลยีใหม่ๆ ดูแลโครงสร้างพื้นฐานไอที ระบบความปลอดภัย และพัฒนาดิจิทัลโซลูชัน ให้พร้อมใช้งานตลอด 24 ชั่วโมง',
-    responsibilities: [
-      'ออกแบบและพัฒนาสถาปัตยกรรมระบบเว็บและซอฟต์แวร์ของบริษัท',
-      'ดูแลความปลอดภัยของข้อมูล (Cybersecurity) และ Cloud Infrastructure',
-      'นำเทคโนโลยี AI และ Automation มาประยุกต์ใช้เพิ่มประสิทธิภาพ'
-    ],
-    stats: { uptime: '99.99%', codeCommits: '1.2k', experience: '6 ปี' }
-  }
+    name: 'นายเกรียงศักดิ์ ปานสวย',
+    role: 'ฝ่าย IT (CTO)',
+    company: 'SabaiDiSabaichaiNoNYuBan',
+    bio: 'ผู้อยู่เบื้องหลังระบบเทคโนโลยีและโครงสร้างพื้นฐานดิจิทัลทั้งหมดของ SabaiDiSabaichaiNoNYuBan',
+    detailBio: 'ออกแบบสถาปัตยกรรมระบบ พัฒนาเว็บแอปพลิเคชัน รักษาความปลอดภัยของข้อมูล และประยุกต์ใช้เทคโนโลยีใหม่ๆ เพื่อขับเคลื่อนธุรกิจ',
+    skills: ['Software Architecture', 'Cloud Infrastructure', 'Cybersecurity'],
+    image: { src: 'images/9.jpg' },
+  },
 ];
 
-export default function App() {
-  const [activeTab, setActiveTab] = useState('gallery'); // 'gallery', 'about', 'github'
-  const [activeSlide, setActiveSlide] = useState(0);
-  const [autoplay, setAutoplay] = useState(true);
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [selectedRoleFilter, setSelectedRoleFilter] = useState('ALL');
+interface AnimatedSliderGalleryProps {
+  slides?: typeof TEAM_SLIDES;
+  cardWidth?: number;
+  cardHeight?: number;
+  autoplay?: boolean;
+}
 
-  const n = TEAM_MEMBERS.length;
+export default function AnimatedSliderGallery({
+  slides = TEAM_SLIDES,
+  cardWidth = 360,
+  cardHeight = 440,
+  autoplay = false,
+}: AnimatedSliderGalleryProps) {
+  const [active, setActive] = useState(0);
+  const [isAutoplayActive, setIsAutoplayActive] = useState(autoplay);
+  const n = slides.length;
   const isDragging = useRef(false);
   const dragStartX = useRef(0);
   const lockRef = useRef(false);
 
-  // Carousel transition function
-  const step = useCallback((dir) => {
+  const step = useCallback((dir: number) => {
     if (lockRef.current) return;
     lockRef.current = true;
     setTimeout(() => { lockRef.current = false; }, 400);
-    setActiveSlide((curr) => (((curr + dir) % n) + n) % n);
+    setActive((curr) => (((curr + dir) % n) + n) % n);
   }, [n]);
 
-  // Autoplay timer effect
   useEffect(() => {
-    if (!autoplay || activeTab !== 'gallery') return;
+    if (!isAutoplayActive) return;
     const interval = setInterval(() => step(1), 3500);
     return () => clearInterval(interval);
-  }, [autoplay, step, activeTab]);
+  }, [isAutoplayActive, step]);
 
-  // Pointer drag interactions
-  const handlePointerDown = (e) => {
+  const handlePointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
     dragStartX.current = e.clientX;
     e.currentTarget.setPointerCapture(e.pointerId);
   };
 
-  const handlePointerUp = (e) => {
+  const handlePointerUp = (e: React.PointerEvent) => {
     if (!isDragging.current) return;
     isDragging.current = false;
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch (err) {
-      // Ignore capture release error
-    }
+    e.currentTarget.releasePointerCapture(e.pointerId);
     const delta = e.clientX - dragStartX.current;
     if (Math.abs(delta) > 40) {
       step(delta > 0 ? -1 : 1);
     }
   };
 
-  const activeMember = TEAM_MEMBERS[activeSlide];
-
-  const copyDeployScript = () => {
-    const script = `npm run build && npx gh-pages -d dist`;
-    navigator.clipboard.writeText(script);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
+  const currentMember = slides[active];
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-purple-500 selection:text-white flex flex-col justify-between overflow-x-hidden">
+    <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-between py-8 px-4 select-none font-sans overflow-x-hidden">
       
-      {}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-neutral-950/80 border-b border-neutral-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-          
-          {/* Logo & Company Name */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('gallery')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 p-0.5 flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <div className="w-full h-full bg-neutral-950 rounded-[10px] flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-purple-400" />
-              </div>
-            </div>
-            <div>
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-neutral-200 to-purple-400">
-                SabaiDiSabaichaiNoNYuBan
-              </span>
-              <p className="text-[10px] sm:text-xs text-neutral-400 font-medium">สบายดีสบายใจนอนอยู่บ้าน จำกัด</p>
-            </div>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-1 bg-neutral-900/90 p-1.5 rounded-full border border-neutral-800">
-            <button
-              onClick={() => setActiveTab('gallery')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'gallery'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              3D Team Gallery
-            </button>
-            <button
-              onClick={() => setActiveTab('about')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'about'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              เกี่ยวกับบริษัท
-            </button>
-            <button
-              onClick={() => setActiveTab('github')}
-              className={`px-4 py-2 rounded-full text-xs font-semibold transition-all duration-300 flex items-center gap-2 ${
-                activeTab === 'github'
-                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800/50'
-              }`}
-            >
-              <Github className="w-3.5 h-3.5" />
-              GitHub Guide
-            </button>
-          </nav>
-
-          {/* Action Quick Button */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setActiveTab('github')}
-              className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-xs text-neutral-300 transition-colors"
-            >
-              <Github className="w-4 h-4 text-purple-400" />
-              <span>Deploy to GitHub</span>
-            </button>
-          </div>
+      {/* Header Section */}
+      <header className="text-center z-20 my-4 max-w-2xl">
+        <div className="inline-block px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs tracking-widest uppercase mb-3 font-semibold shadow-lg shadow-cyan-500/10">
+          SabaiDiSabaichaiNoNYuBan
         </div>
-
-        {/* Mobile Navigation Bar */}
-        <div className="flex md:hidden border-t border-neutral-800 bg-neutral-900/90 px-2 py-1.5 justify-around">
-          <button
-            onClick={() => setActiveTab('gallery')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-              activeTab === 'gallery' ? 'bg-purple-600 text-white' : 'text-neutral-400'
-            }`}
-          >
-            Gallery
-          </button>
-          <button
-            onClick={() => setActiveTab('about')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-              activeTab === 'about' ? 'bg-purple-600 text-white' : 'text-neutral-400'
-            }`}
-          >
-            About
-          </button>
-          <button
-            onClick={() => setActiveTab('github')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium ${
-              activeTab === 'github' ? 'bg-purple-600 text-white' : 'text-neutral-400'
-            }`}
-          >
-            GitHub
-          </button>
-        </div>
+        <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
+          Meet Our Executive Team
+        </h1>
+        <p className="text-neutral-400 text-sm md:text-base mt-2">
+          คณะผู้บริหารและทีมงานผู้ขับเคลื่อนองค์กร สบายดีสบายใจนอนอยู่อพาร์ทเม้นท์/บ้าน
+        </p>
       </header>
 
-      {}
-      <main className="flex-1">
-        {activeTab === 'gallery' && (
-          <div>
-            {/* Gallery Intro Banner */}
-            <div className="pt-8 pb-4 text-center px-4 max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-xs font-medium mb-3">
-                <Sparkles className="w-3.5 h-3.5" /> Powered by Agentic UI Modern 3D Carousel
-              </div>
-              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-2">
-                บุคลากรทรงคุณค่าแห่ง <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400">SabaiDiSabaichaiNoNYuBan</span>
-              </h1>
-              <p className="text-neutral-400 text-xs sm:text-sm">
-                ทีมงานคุณภาพผู้ขับเคลื่อนความสำเร็จทั้ง 5 แผนกหลัก สัมผัสประสบการณ์การรับชมแบบ 3D Interactive Slider
-              </p>
-            </div>
+      {/* 3D Carousel Gallery Section */}
+      <div
+        tabIndex={0}
+        role="group"
+        aria-label="3D Executive Team Gallery"
+        onPointerDown={handlePointerDown}
+        onPointerUp={handlePointerUp}
+        className="relative w-full max-w-5xl h-[480px] flex items-center justify-center my-4 cursor-grab active:cursor-grabbing outline-none"
+        style={{ perspective: 1600 }}
+      >
+        <div
+          className="relative pointer-events-none"
+          style={{ width: cardWidth, height: cardHeight, transformStyle: 'preserve-3d' }}
+        >
+          {slides.map((slide, i) => {
+            let rel = i - active;
+            if (rel > n / 2) rel -= n;
+            if (rel < -n / 2) rel += n;
 
-            {/* Quick Department Filter Selector */}
-            <div className="flex flex-wrap justify-center gap-2 px-4 mb-4">
-              <button
-                onClick={() => setSelectedRoleFilter('ALL')}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  selectedRoleFilter === 'ALL'
-                    ? 'bg-neutral-200 text-neutral-900 font-semibold'
-                    : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'
-                }`}
-              >
-                ทั้งหมด (5)
-              </button>
-              {TEAM_MEMBERS.map((m, idx) => (
-                <button
-                  key={m.id}
-                  onClick={() => {
-                    setSelectedRoleFilter(m.role);
-                    setActiveSlide(idx);
-                  }}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                    activeSlide === idx
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                      : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'
-                  }`}
-                >
-                  {m.role}
-                </button>
-              ))}
-            </div>
+            const ax = Math.abs(rel);
+            const isVisible = ax <= 2;
+            const isActive = rel === 0;
+            const scale = Math.max(0.4, 1 - ax * 0.16);
+            const tx = rel * 220;
+            const tz = -ax * 240;
+            const ry = -rel * 14;
 
-            {}
-            <div className="relative my-4">
+            return (
               <div
-                tabIndex={0}
-                role="group"
-                aria-label="3D Team Carousel"
-                onPointerDown={handlePointerDown}
-                onPointerUp={handlePointerUp}
-                className="relative w-full h-[420px] sm:h-[480px] flex items-center justify-center overflow-hidden bg-neutral-950 text-white select-none cursor-grab active:cursor-grabbing outline-none"
-                style={{ perspective: 1600 }}
+                key={slide.id || i}
+                onClick={() => !isDragging.current && setActive(i)}
+                className="absolute left-1/2 top-1/2 overflow-hidden rounded-2xl bg-neutral-900 border border-neutral-800 shadow-2xl transition-all duration-500 ease-out cursor-pointer group"
+                style={{
+                  width: cardWidth,
+                  height: cardHeight,
+                  transform: `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
+                  opacity: isVisible ? 1 : 0,
+                  pointerEvents: isVisible ? 'auto' : 'none',
+                  transformStyle: 'preserve-3d',
+                }}
               >
-                {/* Background ambient glow effect */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-600/15 rounded-full filter blur-[100px] pointer-events-none" />
-
-                {/* 3D Container */}
-                <div
-                  className="relative pointer-events-none"
-                  style={{ width: 320, height: 380, transformStyle: 'preserve-3d' }}
-                >
-                  {TEAM_MEMBERS.map((slide, i) => {
-                    let rel = i - activeSlide;
-                    if (rel > n / 2) rel -= n;
-                    if (rel < -n / 2) rel += n;
-
-                    const ax = Math.abs(rel);
-                    const isVisible = ax <= 2;
-                    const isActive = rel === 0;
-                    const scale = Math.max(0.4, 1 - ax * 0.16);
-                    const tx = rel * 200;
-                    const tz = -ax * 220;
-                    const ry = -rel * 14;
-
-                    return (
-                      <div
-                        key={slide.id}
-                        onClick={() => !isDragging.current && setActiveSlide(i)}
-                        className={`absolute left-1/2 top-1/2 overflow-hidden rounded-2xl bg-neutral-900 border ${
-                          isActive ? 'border-purple-500/80 shadow-2xl shadow-purple-500/20 ring-2 ring-purple-500/50' : 'border-neutral-800 shadow-xl'
-                        } transition-all duration-500 ease-out cursor-pointer`}
-                        style={{
-                          width: 320,
-                          height: 380,
-                          transform: `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) scale(${scale})`,
-                          opacity: isVisible ? 1 : 0,
-                          pointerEvents: isVisible ? 'auto' : 'none',
-                          transformStyle: 'preserve-3d',
-                        }}
-                      >
-                        <img
-                          src={slide.image}
-                          alt={slide.name}
-                          draggable={false}
-                          className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/30 to-transparent" />
-                        
-                        {/* Member Role Badge */}
-                        <div className="absolute top-4 left-4 right-4 flex justify-between items-center">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold border backdrop-blur-md ${slide.badgeColor}`}>
-                            {slide.role}
-                          </span>
-                          <span className="text-[10px] text-neutral-300 bg-neutral-950/60 backdrop-blur-sm px-2 py-0.5 rounded">
-                            #{i + 1}
-                          </span>
-                        </div>
-
-                        {/* Title overlay at bottom */}
-                        <div className="absolute bottom-5 left-5 right-5">
-                          <p className="text-xs text-purple-300 font-medium mb-0.5">{slide.roleEn}</p>
-                          <h3 className="text-lg font-bold tracking-tight text-white drop-shadow-md">
-                            {slide.name}
-                          </h3>
-                        </div>
-
-                        {/* Dim Overlay for non-active slides */}
-                        <div
-                          className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-                            isActive ? 'opacity-0' : 'opacity-50'
-                          }`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Left / Right Carousel Control Buttons */}
-                <button
-                  onClick={() => step(-1)}
-                  aria-label="Previous Slide"
-                  className="absolute left-4 sm:left-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 flex items-center justify-center text-white backdrop-blur-md transition-all hover:scale-110 z-20 shadow-lg"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={() => step(1)}
-                  aria-label="Next Slide"
-                  className="absolute right-4 sm:right-12 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-neutral-900/80 hover:bg-neutral-800 border border-neutral-700/80 flex items-center justify-center text-white backdrop-blur-md transition-all hover:scale-110 z-20 shadow-lg"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
-
-                {/* Autoplay & Navigation Controls */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-4 z-20 bg-neutral-900/90 backdrop-blur-md px-4 py-2 rounded-full border border-neutral-800 shadow-xl">
-                  {/* Play / Pause Toggle */}
-                  <button
-                    onClick={() => setAutoplay(!autoplay)}
-                    className="text-neutral-400 hover:text-white transition-colors p-1"
-                    title={autoplay ? 'Pause Autoplay' : 'Start Autoplay'}
-                  >
-                    {autoplay ? <Pause className="w-4 h-4 text-purple-400" /> : <Play className="w-4 h-4 text-emerald-400" />}
-                  </button>
-
-                  <div className="h-3 w-[1px] bg-neutral-700" />
-
-                  {/* Pagination Dots */}
-                  <div className="flex items-center gap-2">
-                    {TEAM_MEMBERS.map((_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setActiveSlide(i)}
-                        aria-label={`Go to slide ${i + 1}`}
-                        className={`transition-all duration-300 rounded-full cursor-pointer ${
-                          activeSlide === i ? 'w-6 h-2 bg-gradient-to-r from-purple-400 to-indigo-400' : 'w-2 h-2 bg-white/30 hover:bg-white/60'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {}
-            <div className="max-w-4xl mx-auto px-4 py-6">
-              <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 sm:p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl">
-                {/* Decorative background glow */}
-                <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-indigo-600/10 rounded-full filter blur-[80px]" />
+                {/* Team Member Image */}
+                <img
+                  src={slide.image.src}
+                  alt={slide.name}
+                  draggable={false}
+                  className="absolute inset-0 w-full h-full object-cover select-none pointer-events-none group-hover:scale-105 transition-transform duration-700"
+                />
                 
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center relative z-10">
-                  {/* Thumbnail / Avatar */}
-                  <div className="md:col-span-4 flex flex-col items-center">
-                    <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden border-2 border-purple-500/40 shadow-xl">
-                      <img
-                        src={activeMember.image}
-                        alt={activeMember.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <span className={`absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${activeMember.badgeColor}`}>
-                        {activeMember.role}
-                      </span>
-                    </div>
-                    <p className="text-xs text-neutral-400 mt-3 font-mono">ID: SDB-2026-00{activeMember.id}</p>
-                  </div>
-
-                  {/* Member Details */}
-                  <div className="md:col-span-8 flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-1">
-                      {React.createElement(activeMember.icon, { className: "w-5 h-5 text-purple-400" })}
-                      <span className="text-xs font-semibold text-purple-400 uppercase tracking-wider">{activeMember.department}</span>
-                    </div>
-                    
-                    <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">{activeMember.name}</h2>
-                    <p className="text-sm text-neutral-400 font-medium mb-4">{activeMember.englishName} — <span className="text-neutral-300">{activeMember.roleEn}</span></p>
-
-                    {/* Member Quote */}
-                    <div className="bg-neutral-950/60 rounded-xl p-3.5 border border-neutral-800/80 italic text-xs sm:text-sm text-neutral-300 mb-4 border-l-4 border-l-purple-500">
-                      "{activeMember.quote}"
-                    </div>
-
-                    {/* Member Bio */}
-                    <p className="text-xs sm:text-sm text-neutral-400 mb-4 leading-relaxed">
-                      {activeMember.bio}
-                    </p>
-
-                    {/* Responsibilities */}
-                    <div>
-                      <h4 className="text-xs font-semibold text-neutral-200 mb-2 flex items-center gap-1.5">
-                        <Briefcase className="w-3.5 h-3.5 text-purple-400" /> ความรับผิดชอบหลัก:
-                      </h4>
-                      <ul className="space-y-1.5">
-                        {activeMember.responsibilities.map((resp, idx) => (
-                          <li key={idx} className="text-xs text-neutral-300 flex items-start gap-2">
-                            <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                            <span>{resp}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {}
-        {activeTab === 'about' && (
-          <div className="max-w-4xl mx-auto px-4 py-10">
-            <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
-              
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-neutral-800">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
-                  <Building2 className="w-8 h-8" />
-                </div>
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-extrabold text-white">SabaiDiSabaichaiNoNYuBan</h1>
-                  <p className="text-sm text-purple-400">บริษัท สบายดีสบายใจนอนอยู่บ้าน จำกัด</p>
-                </div>
-              </div>
-
-              {/* Company Vision & Concept Briefing */}
-              <div className="space-y-6 text-sm text-neutral-300 leading-relaxed">
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-amber-400" /> Concept & แนวคิดในการออกแบบ
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-90" />
+                
+                {/* Text Content inside Card */}
+                <div className="absolute bottom-6 left-6 right-6 z-10">
+                  <span className="text-xs font-semibold uppercase tracking-wider text-cyan-400 bg-cyan-950/80 px-2.5 py-1 rounded-md border border-cyan-800/50 inline-block mb-2">
+                    {slide.role}
+                  </span>
+                  <h3 className="text-xl font-bold tracking-tight text-white drop-shadow-md">
+                    {slide.name}
                   </h3>
-                  <p className="text-neutral-400 leading-relaxed">
-                    โปรเจกต์นี้ได้รับการดีไซน์ขึ้นเพื่อนำเสนอโครงสร้างองค์กรยุคใหม่ของ <b>SabaiDiSabaichaiNoNYuBan</b> โดยประยุกต์ใช้เทคโนโลยี UI ล่าสุดจาก <b>Agentic UI Framework</b> ด้วยรูปแบบ <b>3D Animate Slider Gallery</b> ซึ่งมอบประสบการณ์การเข้าถึงข้อมูลตัวบุคคลแบบ Interactive สามารถปรับหมุน เลื่อน drag/swipe และแสดงรายละเอียดเชิงลึกของคณะผู้บริหารและฝ่ายต่างๆ ได้อย่างมีประสิทธิภาพ
+                  <p className="text-xs text-neutral-300 mt-1 line-clamp-2 leading-relaxed">
+                    {slide.bio}
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-6">
-                  <div className="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
-                    <h4 className="font-bold text-purple-300 mb-1">วิสัยทัศน์ (Vision)</h4>
-                    <p className="text-xs text-neutral-400">
-                      ก้าวสู่การเป็นผู้นำด้านนวัตกรรมองค์กรที่ทำงานได้อย่างมีประสิทธิภาพสูงสุด ควบคู่ไปกับความสมดุลและความสุขของบุคลากรตามแนวคิด "สบายดีสบายใจ"
-                    </p>
-                  </div>
-                  <div className="bg-neutral-950 p-4 rounded-xl border border-neutral-800">
-                    <h4 className="font-bold text-indigo-300 mb-1">พันธกิจ (Mission)</h4>
-                    <p className="text-xs text-neutral-400">
-                      ขับเคลื่อนธุรกิจด้วยขีดความสามารถของบุคลากรทั้ง 5 ฝ่ายหลัก นำเทคโนโลยีทันสมัยมาประยุกต์ใช้ในการทำงานแบบยืดหยุ่นและไร้รอยต่อ
-                    </p>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-bold text-white mb-3">รายชื่อคณะผู้บริหารและหัวหน้าฝ่าย (Organizational Structure)</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {TEAM_MEMBERS.map((member) => (
-                      <div key={member.id} className="bg-neutral-950 p-3.5 rounded-xl border border-neutral-800 flex items-center gap-3">
-                        <img src={member.image} alt={member.name} className="w-12 h-12 rounded-lg object-cover" />
-                        <div>
-                          <p className="text-xs font-bold text-white">{member.name}</p>
-                          <p className="text-[11px] text-purple-400">{member.role}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                {/* Dark Overlay for inactive cards */}
+                <div
+                  className={`absolute inset-0 bg-black transition-opacity duration-500 ${
+                    isActive ? 'opacity-0' : 'opacity-50'
+                  }`}
+                />
               </div>
-
-            </div>
-          </div>
-        )}
-
-        {}
-        {activeTab === 'github' && (
-          <div className="max-w-4xl mx-auto px-4 py-10">
-            <div className="bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 sm:p-10 backdrop-blur-xl shadow-2xl">
-              
-              <div className="flex items-center justify-between mb-6 pb-6 border-b border-neutral-800">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-neutral-800 flex items-center justify-center text-white border border-neutral-700">
-                    <Github className="w-6 h-6 text-purple-400" />
-                  </div>
-                  <div>
-                    <h1 className="text-2xl font-extrabold text-white">คู่มือการนำขึ้น GitHub Pages / Vercel</h1>
-                    <p className="text-xs text-neutral-400">GitHub Deployment Guide for SabaiDiSabaichaiNoNYuBan Project</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Step by step deployment tutorial */}
-              <div className="space-y-6 text-sm text-neutral-300">
-                
-                {/* Step 1 */}
-                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
-                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">1</span>
-                    ขั้นตอนที่ 1: เตรียมโค้ดและสร้าง Repository บน GitHub
-                  </div>
-                  <ol className="list-disc list-inside text-xs text-neutral-400 space-y-1 pl-2">
-                    <li>เข้าเว็บไซต์ <a href="https://github.com" target="_blank" rel="noreferrer" className="text-purple-400 underline">GitHub.com</a> และล็อกอินเข้าสู่ระบบ</li>
-                    <li>กดปุ่ม <b>New Repository</b> ตั้งชื่อคลังโค้ด เช่น <code className="bg-neutral-900 px-1.5 py-0.5 rounded text-purple-300">sabaidisabaichai-team</code></li>
-                    <li>เลือกตั้งค่าเป็น <b>Public</b> แล้วกด <b>Create repository</b></li>
-                  </ol>
-                </div>
-
-                {/* Step 2 */}
-                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
-                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">2</span>
-                    ขั้นตอนที่ 2: ติดตั้ง `gh-pages` Package สำหรับ Deploy
-                  </div>
-                  <p className="text-xs text-neutral-400 mb-2">รันคำสั่งด้านล่างเพื่อติดตั้ง gh-pages package เพิ่มเติมในโปรเจกต์ React / Vite:</p>
-                  <div className="bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-xs text-emerald-400 flex items-center justify-between">
-                    <code>npm install gh-pages --save-dev</code>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
-                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">3</span>
-                    ขั้นตอนที่ 3: เพิ่ม Script บน package.json
-                  </div>
-                  <p className="text-xs text-neutral-400 mb-2">เปิดไฟล์ <code className="bg-neutral-900 px-1.5 py-0.5 rounded text-purple-300">package.json</code> แล้วเพิ่ม <code className="text-amber-300">homepage</code> และคำสั่ง <code className="text-amber-300">deploy</code> ดังนี้:</p>
-                  <pre className="bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-[11px] text-neutral-300 overflow-x-auto">
-{`"homepage": "https://<your-github-username>.github.io/sabaidisabaichai-team",
-"scripts": {
-  "predeploy": "npm run build",
-  "deploy": "gh-pages -d dist"
-}`}
-                  </pre>
-                </div>
-
-                {/* Step 4 */}
-                <div className="bg-neutral-950 rounded-xl p-4 border border-neutral-800">
-                  <div className="flex items-center gap-2 mb-2 text-purple-400 font-bold">
-                    <span className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center text-xs">4</span>
-                    ขั้นตอนที่ 4: รันคำสั่ง Publish ไปยัง GitHub Pages
-                  </div>
-                  <div className="flex items-center justify-between bg-neutral-900 p-3 rounded-lg border border-neutral-800 font-mono text-xs">
-                    <code className="text-emerald-400">npm run deploy</code>
-                    <button
-                      onClick={copyDeployScript}
-                      className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 rounded text-white text-[11px] flex items-center gap-1 transition-colors"
-                    >
-                      {copiedCode ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                      {copiedCode ? 'คัดลอกแล้ว!' : 'คัดลอกคำสั่ง'}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Extra note for Vercel */}
-                <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs text-purple-300 flex items-start gap-3">
-                  <Info className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" />
-                  <div>
-                    <b>ทางเลือกเสริม (Vercel / Netlify Deployment):</b>
-                    <p className="text-neutral-400 mt-1">
-                      สามารถเชื่อมต่อ GitHub Repository นี้เข้ากับ Vercel.com ได้แบบอัตโนมัติ (Zero Configuration) โดยเพียงแค่กด Import Project บน Vercel ระบบจะทำการ Build และสร้างลิงก์เว็บไซต์ให้ทันที
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-        )}
-      </main>
-
-      {}
-      <footer className="border-t border-neutral-800/80 bg-neutral-950 py-6 text-center text-xs text-neutral-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p>© 2026 SabaiDiSabaichaiNoNYuBan Co., Ltd. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Built with <span className="text-purple-400">Agentic UI 3D Carousel</span> & React
-          </p>
+            );
+          })}
         </div>
-      </footer>
 
+        {/* Controls Overlay (Left/Right Buttons) */}
+        <button
+          onClick={() => step(-1)}
+          className="absolute left-4 z-20 p-3 rounded-full bg-neutral-900/80 border border-neutral-700 text-white hover:bg-neutral-800 transition-colors backdrop-blur-md"
+          aria-label="Previous Slide"
+        >
+          ‹
+        </button>
+        <button
+          onClick={() => step(1)}
+          className="absolute right-4 z-20 p-3 rounded-full bg-neutral-900/80 border border-neutral-700 text-white hover:bg-neutral-800 transition-colors backdrop-blur-md"
+          aria-label="Next Slide"
+        >
+          ›
+        </button>
+      </div>
+
+      {/* Pagination Dots & Autoplay Toggle */}
+      <div className="flex items-center gap-4 my-2 z-20">
+        <div className="flex items-center gap-2">
+          {slides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className={`transition-all duration-300 rounded-full cursor-pointer ${
+                active === i ? 'w-8 h-2.5 bg-cyan-400 shadow-lg shadow-cyan-500/50' : 'w-2.5 h-2.5 bg-neutral-700 hover:bg-neutral-500'
+              }`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={() => setIsAutoplayActive(!isAutoplayActive)}
+          className={`text-xs px-3 py-1 rounded-full border transition-all ${
+            isAutoplayActive 
+              ? 'bg-cyan-500/20 border-cyan-500/50 text-cyan-300' 
+              : 'bg-neutral-800 border-neutral-700 text-neutral-400'
+          }`}
+        >
+          {isAutoplayActive ? 'Autoplay: ON' : 'Autoplay: OFF'}
+        </button>
+      </div>
+
+      {/* Detail Bio Card for Active Member */}
+      <div className="w-full max-w-2xl bg-neutral-900/80 border border-neutral-800 rounded-2xl p-6 backdrop-blur-xl mt-4 z-20 shadow-2xl transition-all duration-300">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-neutral-800 pb-4 mb-4 gap-2">
+          <div>
+            <h2 className="text-2xl font-bold text-white">{currentMember.name}</h2>
+            <p className="text-cyan-400 text-sm font-medium">{currentMember.role} • {currentMember.company}</p>
+          </div>
+          <span className="text-xs text-neutral-500 font-mono">
+            {active + 1} / {n}
+          </span>
+        </div>
+
+        <p className="text-neutral-300 text-sm leading-relaxed mb-4">
+          {currentMember.detailBio}
+        </p>
+
+        <div>
+          <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Core Competencies</h4>
+          <div className="flex flex-wrap gap-2">
+            {currentMember.skills.map((skill, idx) => (
+              <span 
+                key={idx}
+                className="text-xs px-3 py-1 rounded-lg bg-neutral-800 text-neutral-300 border border-neutral-700/60"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="mt-8 text-neutral-500 text-xs text-center">
+        © {new Date().getFullYear()} SabaiDiSabaichaiNoNYuBan. All rights reserved.
+      </footer>
     </div>
   );
 }
